@@ -127,13 +127,18 @@ public:
         if (this->data.count(date) > 0) {
             return this->data.at(date);
         }
+        return {};
     };
 
     void Print() const {
-        for (const auto &record : this->data) {
-            for (const auto &event: record.second) {
-                cout << record.first << " " << event << "\n";
+        if (this->data.size() > 0) {
+            for (const auto &record : this->data) {
+                for (const auto &event: record.second) {
+                    cout << record.first << " " << event << "\n";
+                }
             }
+        } else {
+            cout << "" << "\n";
         }
     };
 
@@ -174,6 +179,8 @@ void HandleInput(const string &command, Database &db) {
             for (const auto &e: events) {
                 cout << e << "\n";
             }
+        } else {
+            cout << "" << "\n";
         }
 
     } else if (op_code == "Print") {
