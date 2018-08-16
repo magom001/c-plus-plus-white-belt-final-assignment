@@ -151,9 +151,7 @@ void HandleInput(const string &command, Database &db) {
         string event;
         ss >> date >> event;
         db.AddEvent(date, event);
-    }
-
-    if (op_code == "Del") {
+    } else if (op_code == "Del") {
         Date date;
         string event;
         ss >> date >> event;
@@ -166,9 +164,7 @@ void HandleInput(const string &command, Database &db) {
                 cout << "Event not found" << "\n";
             }
         }
-    }
-
-    if (op_code == "Find") {
+    } else if (op_code == "Find") {
         Date date;
         ss >> date;
 
@@ -179,11 +175,13 @@ void HandleInput(const string &command, Database &db) {
             }
         }
 
+    } else if (op_code == "Print") {
+        db.Print();
+    } else {
+        throw runtime_error("Unknown command: " + op_code);
     }
 
-    if (op_code == "Print") {
-        db.Print();
-    }
+
 }
 
 int main() {
