@@ -34,7 +34,7 @@ class Date {
         return stream;
     }
 
-    friend ostream &operator<<(ostream &stream, Date &date) {
+    friend ostream &operator<<(ostream &stream, const Date &date) {
         stream << setw(4) << setfill('0') << date.GetYear()
                << "-"
                << setw(2) << setfill('0') << date.GetMonth()
@@ -95,30 +95,103 @@ private:
     }
 };
 
-bool operator<(const Date &lhs, const Date &rhs);
+bool operator<(const Date &lhs, const Date &rhs) {
+    return (lhs.GetYear() * 12 * 31 + lhs.GetMonth() * 31 + lhs.GetDay()) <
+           (rhs.GetYear() * 12 * 31 + rhs.GetMonth() * 31 + rhs.GetDay());
+};
 
 class Database {
 public:
-    void AddEvent(const Date &date, const string &event);
+    void AddEvent(const Date &date, const string &event) {
+        this->data[date].insert(event);
+    };
 
-    bool DeleteEvent(const Date &date, const string &event);
+    bool DeleteEvent(const Date &date, const string &event) {
+        if (this->data.count(date) > 0) {
+            if (this->data[date].count(event) > 0) {
+                data[date].erase(event);
+                return true;
+            }
+        }
+        return false;
+    };
 
-    int DeleteDate(const Date &date);
+    int DeleteDate(const Date &date) {
+        int number_of_events = data[date].size();
+        data.erase(date);
+        return number_of_events;
+    };
 
-    string &Find(const Date &date) const;
+    set<string> Find(const Date &date) const {
+        if (this->data.count(date) > 0) {
+            return this->data.at(date);
+        }
+    };
 
-    void Print() const;
+    void Print() const {
+        for (const auto &record : this->data) {
+            for (const auto &event: record.second) {
+                cout << record.first << " " << event << "\n";
+            }
+        }
+    };
 
 private:
     map<Date, set<string>> data;
 };
+
+void HandleInput(const string &command, Database &db) {
+
+    string op_code;
+    stringstream ss(command);
+    ss >> op_code;
+
+    if (op_code == "Add") {
+        Date date;
+        string event;
+        ss >> date >> event;
+        db.AddEvent(date, event);
+    }
+
+    if (op_code == "Del") {
+        Date date;
+        string event;
+        ss >> date >> event;
+        if (event.empty()) {
+            cout << "Deleted " << db.DeleteDate(date) << " events" << "\n";
+        } else {
+            if (db.DeleteEvent(date, event)) {
+                cout << "Deleted successfully" << "\n";
+            } else {
+                cout << "Event not found" << "\n";
+            }
+        }
+    }
+
+    if (op_code == "Find") {
+        Date date;
+        ss >> date;
+
+        auto events = db.Find(date);
+        if (!events.empty()) {
+            for (const auto &e: events) {
+                cout << e << "\n";
+            }
+        }
+
+    }
+
+    if (op_code == "Print") {
+        db.Print();
+    }
+}
 
 int main() {
     Database db;
     string command;
     try {
         while (getline(cin, command)) {
-
+            HandleInput(command, db);
         }
 
     }
