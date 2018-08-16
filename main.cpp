@@ -65,15 +65,16 @@ public:
         if (month > 0 && month < 13) {
             this->month = month;
         } else {
-            this->throwRuntimeException("Month value is invalid: " + month);
+            string error_msg = "Month value is invalid: " + to_string(month);
+            this->throwRuntimeException(error_msg);
         }
     }
 
     void SetDay(int day) {
-        if (day > 0 && month < 32) {
+        if (day > 0 && day < 32) {
             this->day = day;
         } else {
-            this->throwRuntimeException("Day value is invalid: " + day);
+            this->throwRuntimeException("Day value is invalid: " + to_string(day));
         }
     }
 
@@ -177,7 +178,9 @@ void HandleInput(const string &command, Database &db) {
 
     } else if (op_code == "Print") {
         db.Print();
-    } else {
+
+    } else if (op_code.empty()) {}
+    else {
         throw runtime_error("Unknown command: " + op_code);
     }
 
